@@ -14,8 +14,10 @@ import {
 } from '@nestjs/common';
 import { CreateResourceInput } from './dto/create-resource.input';
 import { UpdateResourceInput } from './dto/update-resource.input';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @Controller({ path: 'resource', version: '1' })
 export class ResourceController {
   constructor(private readonly resourceLibService: ResourceLibService) {}
