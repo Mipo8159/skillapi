@@ -1,5 +1,5 @@
 import { plainToClass } from 'class-transformer';
-import { In, Repository, UpdateResult } from 'typeorm';
+import { In, Raw, Repository, UpdateResult } from 'typeorm';
 import { ResourceRepository } from '../resource.repository.interface';
 import { ResourceEntity } from '../../entities';
 import { ResourceModel } from '../../models';
@@ -24,10 +24,30 @@ export class ResourceTypeormRepository implements ResourceRepository {
     return this.bulkToModels(entities);
   }
 
-  public async findByResource(resource: string): Promise<ResourceModel[]> {
-    const entities = await this.resourceRepository.find({
-      where: { resource },
-    });
+  public async findByResource(
+    resource: string,
+    filters: Record<string, string> = {},
+  ): Promise<ResourceModel[]> {
+    const where: any = { resource };
+
+    const jsonConditions: string[] = [];
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (key === 'inStock') {
+        const boolValue = value.toLowerCase() === 'true' ? 'true' : 'false';
+        jsonConditions.push(`data -> '${key}' = '${boolValue}'::jsonb`);
+      } else {
+        jsonConditions.push(
+          `data ->> '${key}' = '${value.replace(/'/g, "''")}'`,
+        );
+      }
+    }
+
+    if (jsonConditions.length > 0) {
+      where.data = Raw(() => jsonConditions.join(' AND '));
+    }
+
+    const entities = await this.resourceRepository.find({ where });
     return this.bulkToModels(entities);
   }
 

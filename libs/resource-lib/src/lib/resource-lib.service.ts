@@ -2,6 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { RESOURCE_REPOSITORY_TOKEN, ResourceRepository } from './repositories';
 import { ResourceModel } from './models';
 import { CreateResourceDto, UpdateResourceDto } from './dto';
+import { ResourceFilterDto } from 'src/resource/dto/resource-filter.dto';
 
 @Injectable()
 export class ResourceLibService {
@@ -27,8 +28,11 @@ export class ResourceLibService {
     return res;
   }
 
-  public async findByResource(resource: string): Promise<ResourceModel[]> {
-    return this.resourceRepository.findByResource(resource);
+  public async findByResource(
+    resource: string,
+    filters?: ResourceFilterDto,
+  ): Promise<ResourceModel[]> {
+    return this.resourceRepository.findByResource(resource, filters);
   }
 
   public async findByUuids(ids: string[]): Promise<ResourceModel[]> {

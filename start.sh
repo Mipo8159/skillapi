@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ENV=$1 || 'development'
 
 npm run migrate:latest 

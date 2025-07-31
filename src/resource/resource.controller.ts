@@ -10,11 +10,13 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CreateResourceInput } from './dto/create-resource.input';
 import { UpdateResourceInput } from './dto/update-resource.input';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { ResourceFilterDto } from './dto/resource-filter.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -43,8 +45,11 @@ export class ResourceController {
   }
 
   @Get(':resource')
-  async find(@Param('resource') resource: string): Promise<ResourceModel[]> {
-    return this.resourceLibService.findByResource(resource);
+  async find(
+    @Param('resource') resource: string,
+    @Query() filters: ResourceFilterDto,
+  ): Promise<ResourceModel[]> {
+    return this.resourceLibService.findByResource(resource, filters);
   }
 
   @Put(':resource/:id')
