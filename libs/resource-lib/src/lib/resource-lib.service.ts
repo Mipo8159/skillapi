@@ -31,8 +31,9 @@ export class ResourceLibService {
   public async findByResource(
     resource: string,
     filters?: ResourceFilterDto,
+    sort?: 'ASC' | 'DESC',
   ): Promise<ResourceModel[]> {
-    return this.resourceRepository.findByResource(resource, filters);
+    return this.resourceRepository.findByResource(resource, filters, sort);
   }
 
   public async findByUuids(ids: string[]): Promise<ResourceModel[]> {

@@ -1,5 +1,5 @@
 import { plainToClass } from 'class-transformer';
-import { In, Raw, Repository, UpdateResult } from 'typeorm';
+import { FindOptionsOrder, In, Raw, Repository, UpdateResult } from 'typeorm';
 import { ResourceRepository } from '../resource.repository.interface';
 import { ResourceEntity } from '../../entities';
 import { ResourceModel } from '../../models';
@@ -27,10 +27,21 @@ export class ResourceTypeormRepository implements ResourceRepository {
   public async findByResource(
     resource: string,
     filters: Record<string, string> = {},
+    sort?: 'ASC' | 'DESC',
   ): Promise<ResourceModel[]> {
     const where: any = { resource };
-
     const jsonConditions: string[] = [];
+
+    const search = filters.search?.trim();
+    if (search) {
+      const escapedSearch = search.replace(/'/g, "''");
+
+      jsonConditions.push(
+        `(data ->> 'title' ILIKE '%${escapedSearch}%' OR data ->> 'description' ILIKE '%${escapedSearch}%')`,
+      );
+
+      delete filters.search;
+    }
 
     for (const [key, value] of Object.entries(filters)) {
       if (key === 'inStock') {
@@ -47,7 +58,15 @@ export class ResourceTypeormRepository implements ResourceRepository {
       where.data = Raw(() => jsonConditions.join(' AND '));
     }
 
-    const entities = await this.resourceRepository.find({ where });
+    const order: FindOptionsOrder<object> | undefined = sort
+      ? { createdAt: sort.toUpperCase() === 'DESC' ? 'DESC' : 'ASC' }
+      : undefined;
+
+    const entities = await this.resourceRepository.find({
+      where,
+      ...(order && { order }),
+    });
+
     return this.bulkToModels(entities);
   }
 

@@ -16,6 +16,7 @@ export interface ResourceRepository {
   findByResource(
     resource: string,
     filters?: ResourceFilterDto,
+    sort?: 'ASC' | 'DESC',
   ): Promise<ResourceModel[]>;
 }
 

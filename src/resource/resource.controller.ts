@@ -48,8 +48,9 @@ export class ResourceController {
   async find(
     @Param('resource') resource: string,
     @Query() filters: ResourceFilterDto,
+    @Query('sort') sort?: 'ASC' | 'DESC',
   ): Promise<ResourceModel[]> {
-    return this.resourceLibService.findByResource(resource, filters);
+    return this.resourceLibService.findByResource(resource, filters, sort);
   }
 
   @Put(':resource/:id')

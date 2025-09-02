@@ -16,4 +16,9 @@ export class ResourceFilterDto {
   @ApiProperty()
   @IsOptional()
   role?: string;
+
+  @IsString()
+  @ApiProperty()
+  @IsOptional()
+  search?: string;
 }
